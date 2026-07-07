@@ -110,6 +110,18 @@ class xFuserZImageTransformer2DWrapper(xFuserTransformerBaseWrapper):
         for layer in self.module.layers:
             layer.attention.processor = xFuserZSingleStreamAttnProcessor()
 
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path, **kwargs):
+        """
+        Load a ZImageTransformer2DModel from pretrained weights and wrap it.
+        This is used by the model runner, which calls from_pretrained directly
+        on this class instead of going through the pipeline wrapper registry.
+        """
+        transformer = ZImageTransformer2DModel.from_pretrained(
+            pretrained_model_name_or_path, **kwargs
+        )
+        return cls(transformer)
+
 
     def _chunk_and_pad_sequence(self, x: torch.Tensor, sp_world_rank: int, sp_world_size: int, pad_amount: int, dim: int) -> torch.Tensor:
         if pad_amount > 0:
